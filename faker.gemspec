@@ -14,6 +14,8 @@ Gem::Specification.new do |s|
   s.rubyforge_project = "faker"
 
   s.add_dependency 'i18n', '~> 0.5'
+  s.add_dependency 'script_detector'
+  s.add_dependency 'romaji'
 
   s.add_development_dependency 'test-unit', '2.5.5'
   s.add_development_dependency 'rake', '10.1.0'

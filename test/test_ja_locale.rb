@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require File.expand_path(File.dirname(__FILE__) + '/test_helper.rb')
 
 LoadedEsYaml = ['en', 'es', 'ja'].inject({}) do |h, locale|
@@ -8,12 +10,6 @@ end
 class TestJaLocale < Test::Unit::TestCase
   def teardown
     Faker::Config.locale = nil
-  end
-
-  def test_locale_separate_from_i18n
-    I18n.locale = :en
-    Faker::Config.locale = :ja
-    assert Faker::Address.street_name.match(//)
   end
 
   def test_configured_locale_translation
@@ -33,7 +29,8 @@ class TestJaLocale < Test::Unit::TestCase
 
   def test_username_not_blank_for_ja
   	Faker::Config.locale = 'ja'
-  	assert_match /[.]+/, Faker::Internet.user_name
+    foo = Faker::Internet.user_name
+  	assert_match /[.]+/, foo
   end
 
 end

@@ -73,14 +73,16 @@ module Faker
           gsub(/\[([^\]]+)\]/) {|match| $1.split('').sample }.                                                          # All [ABC] become B (or A or C)
           gsub('\d') {|match| Numbers.sample }.
           gsub('\w') {|match| Letters.sample }
-      end
+        end
 
       # Helper for the common approach of grabbing a translation
       # with an array of values and selecting one of them.
       def fetch(key)
         fetched = translate("faker.#{key}")
         fetched = fetched.sample if fetched.respond_to?(:sample)
-        if fetched.match(/^\//) and fetched.match(/\/$/) # A regex
+        if fetched.contains_asian_characters?
+          fetched
+        elsif fetched.match(/^\//) and fetched.match(/\/$/) # A regex
           regexify(fetched)
         else
           fetched
@@ -91,9 +93,10 @@ module Faker
       # into method calls that can be used to generate a
       # formatted translation: e.g., "#{first_name} #{last_name}".
       def parse(key)
-        return_string = fetch(key).scan(/(\(?)#\{([A-Za-z]+\.)?([^\}]+)\}([^#]+)?/).map {|prefix, kls, meth, etc|
+        return_string = fetch(key).scan(/(\(?)#\{([A-Za-z]+\.)?([^\}]+)\}([^#]+)?/).map {|prefix, kls, meth, etc|          
           # If the token had a class Prefix (e.g., Name.first_name)
           # grab the constant, otherwise use self
+
           cls = kls ? Faker.const_get(kls.chop) : self
 
           # If an optional leading parentheses is not present, prefix.should == "", otherwise prefix.should == "("
@@ -102,16 +105,17 @@ module Faker
 
           # If the class has the method, call it, otherwise
           # fetch the transation (i.e., faker.name.first_name)
-          text += cls.respond_to?(meth) ? cls.send(meth) : fetch("#{(kls || self).to_s.split('::').last.downcase}.#{meth.downcase}")
+          text += cls.respond_to?(meth) ? cls.send(meth) : fetch("#{(kls || self).to_s.split('::').last.downcase}.#{meth.downcase}")            
 
           # And tack on spaces, commas, etc. left over in the string
           text += etc.to_s
-        }.join
+          }.join
 
-        puts "Returning: #{return_string}"
+        if return_string.join.contains_asian_characters?
+          puts "Asian characters found!"
+        end
 
         return_string
-
 
       end
 
@@ -167,3 +171,6 @@ require 'faker/number'
 
 require 'extensions/array'
 require 'extensions/symbol'
+require 'extensions/string'
+
+require 'script_detector'
