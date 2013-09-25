@@ -33,7 +33,7 @@ class TestJaLocale < Test::Unit::TestCase
 
   def test_username_not_blank_for_ja
   	Faker::Config.locale = 'ja'
-  	assert_equal 'foo', Faker::Internet.user_name
+  	assert_match /[.]+/, Faker::Internet.user_name
   end
 
 end
